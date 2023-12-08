@@ -1,11 +1,11 @@
 import readers as rd
 import networkx as nx
-from pathlib import Path
+# from pathlib import Path
 import gravis as gv
 
 # #### Read vdt file
 
-#fname = 'large.vdt' 
+#fname = 'victor.vdt' 
 fname = 'lucas.vdt' 
 G, processes, commodities = rd.graph_from_vdt(fname)
 
