@@ -1,13 +1,19 @@
 import readers as rd
 import networkx as nx
-# from pathlib import Path
 import gravis as gv
 
 # #### Read vdt file
 
 #fname = 'victor.vdt' 
-fname = 'lucas.vdt' 
-G, processes, commodities = rd.graph_from_vdt(fname)
+#fname = 'lucas.vdt' 
+fname, columns = 'lucas_clean.csv', ['process','commodity','direction']
+G, processes, commodities = rd.graph_from_csv(fname, *columns)
+
+G
+
+processes
+
+commodities
 
 # #### Dimensions
 
@@ -121,7 +127,7 @@ for n in bad_nodes:
 print([len(bad_nodes), len(funny_leaves), len(funny_roots)])
 print([len(bad_nodes), len(good_nodes), nNodes])
 
-#assert len(bad_nodes) == 0 , 'Extracted graph: unexpected dimensions'
+assert len(bad_nodes) == 0 , 'Extracted graph: unexpected dimensions'
 # -
 
 GX = G.subgraph(good_nodes)
@@ -179,3 +185,8 @@ funny_leaves
 funny_roots
 
 nx.find_cycle(GX)
+
+path = 'lucas_clean.xml'
+nx.write_graphml(GX, path)
+
+

@@ -14,8 +14,8 @@ import networkx as nx
 from pathlib import Path
 
 def df_to_graph(df):
-    cname = 'commodity_id'
-    pname = 'process_id'
+    cname = 'commodity'
+    pname = 'process'
     sname = 'direction'
     
     commodities = df[cname].unique()    
@@ -30,19 +30,19 @@ def df_to_graph(df):
     return G, processes, commodities
 
 # generic csv read
-def graph_from_csv(fname, pname='process_id', cname='commodity_id', 
+def graph_from_csv(fname, pname='process', cname='commodity', 
                    sname='direction'): 
     csv_file = Path('.') / 'VDT' / fname
     df = pd.read_csv(csv_file)
-    G, processes, commodities = df_to_graph(df)
+    G, processes, commodities = df_to_graph(df )
     return G, processes, commodities
 
 # Just columns renaming
 def graph_from_vdt(fname):
     vdt_file = Path('.') / 'VDT' / fname
     df = pd.read_csv(vdt_file,  skiprows=3, 
-        names = ['zone', 'process_id', 'commodity_id', 'direction'])
-    G, processes, commodities = df_to_graph(df[[ 'process_id', 'commodity_id', 'direction']])
+        names = ['zone', 'process', 'commodity', 'direction'])
+    G, processes, commodities = df_to_graph(df[[ 'process', 'commodity', 'direction']])
     return G, processes, commodities
 
 if __name__ == '__main__':
