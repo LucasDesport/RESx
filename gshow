@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jan 11 13:20:02 2024
+
+@author: jpm
+"""
+
+import click
+# import pathlib
+import networkx as nx
+# import sys
+import gravis as gv
+
+
+__version__ = '0.1'
+default_xml = 'lucas_clean.xml'
+
+
+@click.group(invoke_without_command=True, no_args_is_help=True)
+@click.version_option(__version__)
+@click.option('-G', '--graph', 'graph_xml_file', default=default_xml,
+              help=f"Graph XML file name  (default: {default_xml})")
+@click.pass_context
+def cli(ctx, graph_xml_file):
+    # Execution context.
+    ctx.ensure_object(dict)
+    ctx.obj['GRAPH'] = nx.read_graphml(graph_xml_file)
+
+@cli.command(name='parents')
+@click.pass_context
+@click.argument('node', nargs=1, required=True)
+def parents(ctx, node):
+    G = ctx.obj['GRAPH']
+    # print(f"G={G}, -- request = parents {node} {depth}")
+    for n in G.predecessors(node):
+        print(n)
+    
+    
+@cli.command(name='children')
+@click.pass_context
+@click.argument('node', nargs=1, required=True)
+def children(ctx, node):
+    G = ctx.obj['GRAPH']
+    # print(f"G={G}, -- request = children {node} {depth}")
+    for n in G.successors(node):
+        print(n)
+        
+@cli.command(name='neighbours')
+@click.pass_context
+@click.argument('node', nargs=1, required=True)
+@click.argument('up', nargs=1, required=True)
+@click.argument('down', nargs=1, required=True)
+def neighbours(ctx, node, up, down):
+    G = ctx.obj['GRAPH']
+    GX = nx.DiGraph()
+    
+    # Recursions
+    def upWard(layer):
+        up_layer = []
+        for n in layer:
+            for m in G.predecessors(n):
+                GX.add_edge(m, n) 
+                up_layer.append(m)
+        return  up_layer
+    
+    
+    def downWard(layer):
+        down_layer = []
+        for n in layer:
+            for p in G.successors(n):
+                GX.add_edge(n,p) 
+                down_layer.append(p)
+        return  down_layer        
+    
+    layer = [node]
+    for idx in range(int(up)):
+        layer = upWard(layer)
+        
+    layer = [node]
+    for idx in range(int(down)):
+        layer = downWard(layer)
+        
+
+    # Inherit attributes from G
+    for n in GX.nodes():
+        print(n)
+        GX.nodes[n]['color'] =  G.nodes[n]['color']
+        GX.nodes[n]['type'] =  G.nodes[n]['type'] 
+        GX.nodes[n]['name'] =  n 
+
+    gv.d3(GX, node_label_size_factor=0.5).display()
+    nx.write_graphml(GX, 'GX.xml',  named_key_ids=True)
+    # edge_df = nx.to_pandas_edgelist(GX)
+    # print(edge_df)
+    # node_df = nx.to_pandas_nodelist(GX)
+    # print(node_df)
+    
+@cli.command(name='path')
+@click.pass_context
+@click.argument('source', nargs=1, required=True)
+@click.argument('target', nargs=1, required=True)
+def path(ctx, source, target):    
+    G = ctx.obj['GRAPH']
+    GX = nx.DiGraph()
+    for p in nx.all_shortest_paths(G, source, target):
+        for e in zip(p[:-1],p[1:]):
+            print(e)
+            GX.add_edge(*e)    
+            
+    # Inherit attributes from G
+    for n in GX.nodes():
+        print(n)
+        GX.nodes[n]['color'] =  G.nodes[n]['color']
+        GX.nodes[n]['type'] =  G.nodes[n]['type'] 
+        GX.nodes[n]['name'] =  n    
+    gv.d3(GX, node_label_size_factor=0.5).display()
+    nx.write_graphml(GX, 'GX.xml',  named_key_ids=True) 
+    
+    pass
+
+
+@cli.command(name='full')
+@click.pass_context
+def full(ctx):
+    G = ctx.obj['GRAPH']    
+    gv.d3(G, node_label_size_factor=0.5).display()
+
+    
+if __name__ == '__main__':
+    cli(obj={})
