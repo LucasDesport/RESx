@@ -5,6 +5,8 @@
  - deploy
  - doc, presentation
 
+ # Bug in README png images
+ 
 
 #========== OLDIES =========
 
