@@ -16,10 +16,10 @@ Extract sub-graphs, sufficiently small to be displayed
 ## Examples
 
 <figure>   
-    <figcaption  class="figure-caption text-center">gshow path ELCNUC INMFUEL</figcaption>
    <img src="gshow+path.png" alt="gshow+path" />
+    <figcaption  class="figure-caption text-center">gshow path ELCNUC INMFUEL</figcaption>
 </figure>
-<figure>   
+<figure>
+   <img src="gshow+neighbours.png" alt="gshow+neighbours" />   
     <figcaption  class="figure-caption text-center">gshow neighbours INMFUEL 3 3</figcaption>
-   <img src="gshow+neighbours.png" alt="gshow+neighbours" />
 </figure>
