@@ -133,9 +133,13 @@ assert len(bad_nodes) == 0 , 'Extracted graph: unexpected dimensions'
 GX = G.subgraph(good_nodes)
 len(GX.nodes)
 
+path = 'lucas_clean.xml'
+nx.write_graphml(GX, path)
+
+
 # #### Plot
 
-gv.d3(GX, node_label_size_factor=0.3)
+gv.d3(GX, node_label_size_factor=0.3).display()
 
 print(f'Edges: total {nEdges} - broken {len(broken_edges)}')
 
@@ -186,7 +190,6 @@ funny_roots
 
 nx.find_cycle(GX)
 
-path = 'lucas_clean.xml'
-nx.write_graphml(GX, path)
+
 
 
