@@ -1,0 +1,19 @@
+.ipynb_checkpoints/
+.spyproject/
+.~lock.res_region_REG1_scen_ALL_sector_ALL.xls#
+GX.graphml
+GX.xml
+OLD_STUFF/
+README.pdf
+VDT/INOUT.txt
+VDT/big.vdt
+VDT/lucas_clean.csv
+VDT/medium.vdt
+VDT/res.csv
+VDT/small.vdt
+__pycache__/
+lucas_clean.xml
+makefile
+res_region_REG1_scen_ALL_sector_ALL (1).xls
+res_region_REG1_scen_ALL_sector_ALL.xls
+venv/
