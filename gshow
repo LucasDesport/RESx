@@ -9,13 +9,35 @@ Created on Thu Jan 11 13:20:02 2024
 import click
 # import pathlib
 import networkx as nx
-# import sys
+import sys
 import gravis as gv
 
 
 __version__ = '0.1'
 default_xml = 'lucas_clean.xml'
+sub_command = ' '.join(sys.argv[1:]) 
+MAX_NODES= 100
 
+def out(GX, G):
+    nb_nodes = GX.number_of_nodes()
+    assert nb_nodes <= MAX_NODES, f'Too many nodes: {nb_nodes}'
+    
+    # Inherit attributes from G
+    for n in GX.nodes():
+        print(n)
+        GX.nodes[n]['color'] =  G.nodes[n]['color']
+        GX.nodes[n]['type'] =  G.nodes[n]['type'] 
+        GX.nodes[n]['name'] =  n    
+
+    gv.d3(GX, node_label_size_factor=0.5).display()
+    
+    # Add a node title
+    # attr = ["Fill Color"="No Color", "Fill Color 2"="No Color", "Line Color"="No Color"  ]
+    GX.add_node("Title")
+    GX.nodes["Title"]['name'] =  sub_command   
+    GX.nodes["Title"]['type'] =  'title'   
+
+    nx.write_graphml(GX, 'GX.xml',  named_key_ids=True)
 
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.version_option(__version__)
@@ -32,17 +54,16 @@ def cli(ctx, graph_xml_file):
 @click.argument('node', nargs=1, required=True)
 def parents(ctx, node):
     G = ctx.obj['GRAPH']
-    # print(f"G={G}, -- request = parents {node} {depth}")
+    print(sub_command)
     for n in G.predecessors(node):
         print(n)
-    
-    
+
 @cli.command(name='children')
 @click.pass_context
 @click.argument('node', nargs=1, required=True)
 def children(ctx, node):
     G = ctx.obj['GRAPH']
-    # print(f"G={G}, -- request = children {node} {depth}")
+    print(sub_command)
     for n in G.successors(node):
         print(n)
         
@@ -64,7 +85,6 @@ def neighbours(ctx, node, up, down):
                 up_layer.append(m)
         return  up_layer
     
-    
     def downWard(layer):
         down_layer = []
         for n in layer:
@@ -80,7 +100,6 @@ def neighbours(ctx, node, up, down):
     layer = [node]
     for idx in range(int(down)):
         layer = downWard(layer)
-        
 
     # Inherit attributes from G
     for n in GX.nodes():
@@ -89,12 +108,7 @@ def neighbours(ctx, node, up, down):
         GX.nodes[n]['type'] =  G.nodes[n]['type'] 
         GX.nodes[n]['name'] =  n 
 
-    gv.d3(GX, node_label_size_factor=0.5).display()
-    nx.write_graphml(GX, 'GX.xml',  named_key_ids=True)
-    # edge_df = nx.to_pandas_edgelist(GX)
-    # print(edge_df)
-    # node_df = nx.to_pandas_nodelist(GX)
-    # print(node_df)
+    out(GX, G)
     
 @cli.command(name='path')
 @click.pass_context
@@ -106,18 +120,8 @@ def path(ctx, source, target):
     for p in nx.all_shortest_paths(G, source, target):
         for e in zip(p[:-1],p[1:]):
             print(e)
-            GX.add_edge(*e)    
-            
-    # Inherit attributes from G
-    for n in GX.nodes():
-        print(n)
-        GX.nodes[n]['color'] =  G.nodes[n]['color']
-        GX.nodes[n]['type'] =  G.nodes[n]['type'] 
-        GX.nodes[n]['name'] =  n    
-    gv.d3(GX, node_label_size_factor=0.5).display()
-    nx.write_graphml(GX, 'GX.xml',  named_key_ids=True) 
-    
-    pass
+            GX.add_edge(*e)            
+    out(GX, G)
 
 
 @cli.command(name='full')
