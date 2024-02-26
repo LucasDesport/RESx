@@ -29,7 +29,7 @@ def out(GX, G):
         GX.nodes[n]['type'] =  G.nodes[n]['type'] 
         GX.nodes[n]['name'] =  n    
 
-    gv.d3(GX, node_label_size_factor=0.5).display()
+    #gv.d3(GX, node_label_size_factor=0.5).display()
     
     # Add a node title
     # attr = ["Fill Color"="No Color", "Fill Color 2"="No Color", "Line Color"="No Color"  ]
