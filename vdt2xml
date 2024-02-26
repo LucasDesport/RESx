@@ -12,9 +12,8 @@ import gravis as gv
 
 # #### Read vdt file
 
-#fname = 'victor.vdt' 
-#fname = 'lucas.vdt' 
-fname, columns = 'lucas_clean.csv', ['process','commodity','direction']
+
+fname, columns = 'tiamvdt.csv', ['process','commodity','direction']
 G, processes, commodities = rd.graph_from_csv(fname, *columns)
 
 G
