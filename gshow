@@ -16,7 +16,7 @@ import gravis as gv
 __version__ = '0.1'
 default_xml = 'lucas_clean.xml'
 sub_command = ' '.join(sys.argv[1:]) 
-MAX_NODES= 100
+MAX_NODES=200
 
 def out(GX, G):
     nb_nodes = GX.number_of_nodes()

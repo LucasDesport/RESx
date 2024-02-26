@@ -140,7 +140,7 @@ assert len(bad_nodes) == 0 , 'Extracted graph: unexpected dimensions'
 GX = G.subgraph(good_nodes)
 len(GX.nodes)
 
-path = 'lucas_clean.xml'
+path = 'tiamvdt.xml'
 nx.write_graphml(GX, path)
 
 
