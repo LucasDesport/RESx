@@ -7,16 +7,26 @@ Created on Thu Jan 11 13:20:02 2024
 """
 
 import click
-# import pathlib
 import networkx as nx
 import sys
 import gravis as gv
+import pathlib
+from REScleaner import clean_vdt
 
-
-__version__ = '0.1'
+__version__ = '0.0.1'
 default_xml = 'current-RES.xml'
 sub_command = ' '.join(sys.argv[1:]) 
 MAX_NODES=200
+
+APP_NAME = 'resx'
+
+CONFIG_DIR = pathlib.Path(click.get_app_dir(APP_NAME))
+DATA_DIR = pathlib.Path.home() / APP_NAME
+
+def get_graph( ):
+    err_msg = f"File {default_xml} does not exist. See {APP_NAME} init --help"
+    assert pathlib.Path(default_xml).is_file(), err_msg
+    return nx.read_graphml(default_xml) 
 
 def out(GX, G):
     nb_nodes = GX.number_of_nodes()
@@ -26,10 +36,10 @@ def out(GX, G):
     for n in GX.nodes():
         print(n)
         GX.nodes[n]['color'] =  G.nodes[n]['color']
-        GX.nodes[n]['type'] =  G.nodes[n]['type'] 
+        # GX.nodes[n]['type'] =  G.nodes[n]['type'] 
         GX.nodes[n]['name'] =  n    
 
-    #gv.d3(GX, node_label_size_factor=0.5).display()
+    gv.d3(GX, node_label_size_factor=0.5).display()
     
     # Add a node title
     # attr = ["Fill Color"="No Color", "Fill Color 2"="No Color", "Line Color"="No Color"  ]
@@ -37,43 +47,55 @@ def out(GX, G):
     GX.nodes["Title"]['name'] =  sub_command   
     GX.nodes["Title"]['type'] =  'title'   
 
-    nx.write_graphml(GX, 'GX.xml',  named_key_ids=True)
-
+    nx.write_graphml(GX, 'GX.xml',  named_key_ids=True)    
+    
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.version_option(__version__)
-@click.option('-G', '--graph', 'graph_xml_file', default=default_xml,
-              help=f"Graph XML file name  (default: {default_xml})")
 @click.pass_context
-def cli(ctx, graph_xml_file):
-    # Execution context.
+def cli(ctx):
     ctx.ensure_object(dict)
-    ctx.obj['GRAPH'] = nx.read_graphml(graph_xml_file)
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)    
+    ctx.obj['graph'] =  get_graph( )
+
+@click.command(name='init')
+@click.argument('vdt_file')
+@click.pass_context
+def init_res(ctx, vdt_file):
+    """Initialize local file current-RES.xml from vdt_file argument."""   
+    vdt, G = clean_vdt(vdt_file)
+    click.echo(vdt.head(10))
+    click.echo('...')
+    gv.d3(G, node_label_size_factor=0.5).display()
+    nx.write_graphml(G, default_xml)
+    click.echo(f"{default_xml} reinitialized with {vdt_file}")
+    ctx.obj['graph'] = G 
 
 @cli.command(name='parents')
 @click.pass_context
 @click.argument('node', nargs=1, required=True)
 def parents(ctx, node):
-    G = ctx.obj['GRAPH']
-    print(sub_command)
+    G = get_graph() 
+    click.echo(sub_command)
     for n in G.predecessors(node):
-        print(n)
-
+        click.echo(n)
+        
 @cli.command(name='children')
 @click.pass_context
 @click.argument('node', nargs=1, required=True)
 def children(ctx, node):
-    G = ctx.obj['GRAPH']
-    print(sub_command)
+    G = get_graph()
+    click.echo(sub_command)
     for n in G.successors(node):
-        print(n)
-        
+        click.echo(n)        
+
 @cli.command(name='neighbours')
 @click.pass_context
-@click.argument('node', nargs=1, required=True)
-@click.argument('up', nargs=1, required=True)
-@click.argument('down', nargs=1, required=True)
-def neighbours(ctx, node, up, down):
-    G = ctx.obj['GRAPH']
+@click.option('--up', nargs=1, default=0)
+@click.option('--down', nargs=1, default=0)
+@click.argument('nodes', nargs=-1, required=True)
+def neighbours(ctx,   up, down, nodes):
+    G =  get_graph() 
     GX = nx.DiGraph()
     
     # Recursions
@@ -93,19 +115,20 @@ def neighbours(ctx, node, up, down):
                 down_layer.append(p)
         return  down_layer        
     
-    layer = [node]
-    for idx in range(int(up)):
-        layer = upWard(layer)
-        
-    layer = [node]
-    for idx in range(int(down)):
-        layer = downWard(layer)
+    for node in nodes:
+        layer = [node]
+        for idx in range(int(up)):
+            layer = upWard(layer)
+            
+        layer = [node]
+        for idx in range(int(down)):
+            layer = downWard(layer)
 
     # Inherit attributes from G
     for n in GX.nodes():
         print(n)
         GX.nodes[n]['color'] =  G.nodes[n]['color']
-        GX.nodes[n]['type'] =  G.nodes[n]['type'] 
+        # GX.nodes[n]['type'] =  G.nodes[n]['type'] 
         GX.nodes[n]['name'] =  n 
 
     out(GX, G)
@@ -123,13 +146,12 @@ def path(ctx, source, target):
             GX.add_edge(*e)            
     out(GX, G)
 
+# cli.add_command(init_res)
+# cli.add_command(parents)
+# cli.add_command(import_scenario)
+# cli.add_command(remove_scenario)
+cli.epilog = f"Run '{APP_NAME} COMMAND --help' for more information on a command."
 
-@cli.command(name='full')
-@click.pass_context
-def full(ctx):
-    G = ctx.obj['GRAPH']    
-    gv.d3(G, node_label_size_factor=0.5).display()
 
-    
 if __name__ == '__main__':
     cli(obj={})
