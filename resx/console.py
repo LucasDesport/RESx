@@ -90,17 +90,17 @@ def out(GX, G):
     
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.version_option(__version__)
-@click.pass_context
-def cli(ctx):
-    ctx.ensure_object(dict)
+# @click.pass_context
+def cli():
+    # ctx.ensure_object(dict)
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)    
-    ctx.obj['graph'] =  get_graph( )
+    # ctx.obj['graph'] =  get_graph( )
 
 @click.command(name='init')
 @click.argument('vdt_file')
-@click.pass_context
-def init(ctx, vdt_file):
+# @click.pass_context
+def init(vdt_file):
     """Initialize local file current-RES.xml from vdt_file argument."""   
     vdt, G = clean_vdt(vdt_file)
     click.echo(vdt.head(10))
@@ -108,32 +108,32 @@ def init(ctx, vdt_file):
     gv.d3(G, node_label_size_factor=0.5).display()
     nx.write_graphml(G, default_xml)
     click.echo(f"{default_xml} reinitialized with {vdt_file}")
-    ctx.obj['graph'] = G 
+    # ctx.obj['graph'] = G 
 
 @cli.command(name='parents')
-@click.pass_context
+# @click.pass_context
 @click.argument('node', nargs=1, required=True)
-def parents(ctx, node):
+def parents(node):
     G = get_graph() 
     click.echo(sub_command)
     for n in G.predecessors(node):
         click.echo(n)
         
 @cli.command(name='children')
-@click.pass_context
+# @click.pass_context
 @click.argument('node', nargs=1, required=True)
-def children(ctx, node):
+def children(node):
     G = get_graph()
     click.echo(sub_command)
     for n in G.successors(node):
         click.echo(n)        
 
 @cli.command(name='neighbours')
-@click.pass_context
+# @click.pass_context
 @click.option('--up', nargs=1, default=0)
 @click.option('--down', nargs=1, default=0)
 @click.argument('nodes', nargs=-1, required=True)
-def neighbours(ctx,   up, down, nodes):
+def neighbours(up, down, nodes):
     G =  get_graph() 
     GX = nx.DiGraph()
     
@@ -173,11 +173,11 @@ def neighbours(ctx,   up, down, nodes):
     out(GX, G)
     
 @cli.command(name='path')
-@click.pass_context
+# @click.pass_context
 @click.argument('source', nargs=1, required=True)
 @click.argument('target', nargs=1, required=True)
-def path(ctx, source, target):    
-    G = ctx.obj['GRAPH']
+def path(source, target):    
+    G = get_graph()  
     GX = nx.DiGraph()
     for p in nx.all_shortest_paths(G, source, target):
         for e in zip(p[:-1],p[1:]):
@@ -194,4 +194,4 @@ cli.epilog = f"Run '{APP_NAME} COMMAND --help' for more information on a command
 
 
 if __name__ == '__main__':
-    cli(obj={})
+    cli()
