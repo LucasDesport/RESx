@@ -23,8 +23,8 @@ MAX_NODES=200
 
 APP_NAME = 'resx'
 
-CONFIG_DIR = pathlib.Path(click.get_app_dir(APP_NAME))
-DATA_DIR = pathlib.Path.home() / APP_NAME
+# CONFIG_DIR = pathlib.Path(click.get_app_dir(APP_NAME))
+# DATA_DIR = pathlib.Path.home() / APP_NAME
 
 def clean_vdt(VDTFILE = 'VDT/newlucas.vdt'):
     '''Read a VEDA-TIMES vdt_file, clean up a
@@ -63,8 +63,12 @@ def clean_vdt(VDTFILE = 'VDT/newlucas.vdt'):
     return vdt, G
     
 def get_graph( ):
-    err_msg = f"File {default_xml} does not exist. See {APP_NAME} init --help"
-    assert pathlib.Path(default_xml).is_file(), err_msg
+    err_msg = f"File {default_xml} does not exist. You should init first. See {APP_NAME} init --help"
+    # assert pathlib.Path(default_xml).is_file(), err_msg 
+    if not pathlib.Path(default_xml).is_file():
+        click.echo(err_msg)
+        sys.exit(0)
+
     return nx.read_graphml(default_xml) 
 
 def out(GX, G):
@@ -92,9 +96,10 @@ def out(GX, G):
 @click.version_option(__version__)
 # @click.pass_context
 def cli():
+    pass
     # ctx.ensure_object(dict)
-    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    DATA_DIR.mkdir(parents=True, exist_ok=True)    
+    # CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    # DATA_DIR.mkdir(parents=True, exist_ok=True)    
     # ctx.obj['graph'] =  get_graph( )
 
 @click.command(name='init')
