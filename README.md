@@ -4,7 +4,8 @@ The VDT file is a VEDA Topology File. VEDA (VErsatile Data Analyst) is a powerfu
 
 Processes and commodities in a VEDA-TIMES model are organized in a directed bi-colored graph interpreted as the RES of the model,  in general too big to be displayed.
 
-RES-Explorer allows to request different extractions of the whole RES graph, in   sufficiently small sub-graphs to be drawn. 
+RES-Explorer allows to request different extractions from the whole RES graph,   resulting in sub-graphs 
+sufficiently small to be drawn. 
 
 Extractions are put in a graphml formatted local file  GX.xml, which can be processed by the yEd application.  yEd offers many nice layouts for graphs.
 
