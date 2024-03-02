@@ -17,7 +17,7 @@ import re
 
 # from resx.REScleaner import clean_vdt
 
-__version__ = '0.0.1'
+__version__ = '0.4.1'
 default_xml = 'current-RES.xml'
 sub_command = ' '.join(sys.argv[1:]) 
 MAX_NODES=500
