@@ -1,26 +1,32 @@
 VDT = VDT/newlucas.vdt
+RESX = python resx/console.py
+RESX = resx
 
-CHECK_RESX = python resx/console.py
+
 
 default:  check
 
 
 
 
-children: ;  @gshow children ELCNUC 
-parents: ;  @gshow parents ELCNUC 
+children: ;  $(RESX) node_children ELCNUC 
+parents: ;  $(RESX) node_parents ELCNUC 
 
-neighbours: ; @gshow neighbours INMFUEL 2 2
+neighbours: ; $(RESX) neighbours --up=1 --down=1  INMFUEL   OILHFO GASRFG
 
-full:; @gshow full
+full:; $(RESX) full
 
-path:; @gshow path ELCNUC INMFUEL  
+path:; $(RESX) path ELCNUC INMFUEL  
 
 readme:; pandoc -o README.html  README.md
 
 check:
-	resx neighbours --up=2 --down=2 OILHFO GASRFG
+	$(RESX) neighbours --up=2 --down=2 INMFUEL
 help:
-	resx --help
+	$(RESX) --help
 	
 clean:; rm -f *.xml *.lock *.graphml
+
+init:; $(RESX) init VDT/newlucas.vdt
+
+sector:; $(RESX) sector BIO

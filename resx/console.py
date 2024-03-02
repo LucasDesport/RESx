@@ -13,13 +13,14 @@ import gravis as gv
 import pathlib
 import pandas as pd
 import numpy as np
+import re
 
 # from resx.REScleaner import clean_vdt
 
 __version__ = '0.0.1'
 default_xml = 'current-RES.xml'
 sub_command = ' '.join(sys.argv[1:]) 
-MAX_NODES=200
+MAX_NODES=500
 
 APP_NAME = 'resx'
 
@@ -44,9 +45,9 @@ def clean_vdt(VDTFILE = 'VDT/newlucas.vdt'):
     
     vdt = vdt[~m] 
     
-    print('Nombre de process    :', vdt['process'].nunique())
-    print('Nombre de commodités :', vdt['commodity'].nunique())
-    print('Nombre de connexions :', len(vdt)) 
+    click.echo('Nombre de process    :', vdt['process'].nunique())
+    click.echo('Nombre de commodités :', vdt['commodity'].nunique())
+    click.echo('Nombre de connexions :', len(vdt)) 
     
     vdt.loc[vdt['commodity'].str.endswith('_'), 'process'].unique() 
     
@@ -73,11 +74,14 @@ def get_graph( ):
 
 def out(GX, G):
     nb_nodes = GX.number_of_nodes()
-    assert nb_nodes <= MAX_NODES, f'Too many nodes: {nb_nodes}'
+    msg = f'Warning:  many nodes ({nb_nodes}) - process anyway ?[y/n] '
+    # assert nb_nodes <= MAX_NODES, msg
+    if nb_nodes > MAX_NODES and input(msg) != 'y':
+        sys.exit(0) 
     
     # Inherit attributes from G
     for n in GX.nodes():
-        print(n)
+        # click.echo(n)
         GX.nodes[n]['color'] =  G.nodes[n]['color']
         # GX.nodes[n]['type'] =  G.nodes[n]['type'] 
         GX.nodes[n]['name'] =  n    
@@ -94,7 +98,6 @@ def out(GX, G):
     
 @click.group(invoke_without_command=True, no_args_is_help=True)
 @click.version_option(__version__)
-# @click.pass_context
 def cli():
     pass
     # ctx.ensure_object(dict)
@@ -104,7 +107,6 @@ def cli():
 
 @click.command(name='init')
 @click.argument('vdt_file')
-# @click.pass_context
 def init(vdt_file):
     """Initialize local file current-RES.xml from vdt_file argument."""   
     vdt, G = clean_vdt(vdt_file)
@@ -115,33 +117,33 @@ def init(vdt_file):
     click.echo(f"{default_xml} reinitialized with {vdt_file}")
     # ctx.obj['graph'] = G 
 
-@cli.command(name='parents')
-# @click.pass_context
+@cli.command(name='node_parents')
 @click.argument('node', nargs=1, required=True)
 def parents(node):
+    """List parents nodes of argument NODE"""
     G = get_graph() 
     click.echo(sub_command)
     for n in G.predecessors(node):
         click.echo(n)
         
-@cli.command(name='children')
-# @click.pass_context
+@cli.command(name='node_children')
 @click.argument('node', nargs=1, required=True)
 def children(node):
+    """List children nodes of argument NODE"""    
     G = get_graph()
     click.echo(sub_command)
     for n in G.successors(node):
         click.echo(n)        
 
 @cli.command(name='neighbours')
-# @click.pass_context
-@click.option('--up', nargs=1, default=0)
-@click.option('--down', nargs=1, default=0)
+@click.option('--up', nargs=1, default=1)
+@click.option('--down', nargs=1, default=1)
 @click.argument('nodes', nargs=-1, required=True)
 def neighbours(up, down, nodes):
+    """Graph neighbours at depths UP,DOWN (default 1,1) of a list of NODES"""       
     G =  get_graph() 
     GX = nx.DiGraph()
-    
+    # click.echo(nodes)
     # Recursions
     def upWard(layer):
         up_layer = []
@@ -160,6 +162,7 @@ def neighbours(up, down, nodes):
         return  down_layer        
     
     for node in nodes:
+        GX.add_node(node)
         layer = [node]
         for idx in range(int(up)):
             layer = upWard(layer)
@@ -170,31 +173,79 @@ def neighbours(up, down, nodes):
 
     # Inherit attributes from G
     for n in GX.nodes():
-        print(n)
+        # click.echo(n)
         GX.nodes[n]['color'] =  G.nodes[n]['color']
-        # GX.nodes[n]['type'] =  G.nodes[n]['type'] 
         GX.nodes[n]['name'] =  n 
 
     out(GX, G)
     
 @cli.command(name='path')
-# @click.pass_context
 @click.argument('source', nargs=1, required=True)
 @click.argument('target', nargs=1, required=True)
-def path(source, target):    
+def path(source, target):  
+    """Graph shortest path between SOURCE and TARGET"""           
     G = get_graph()  
     GX = nx.DiGraph()
     for p in nx.all_shortest_paths(G, source, target):
         for e in zip(p[:-1],p[1:]):
-            print(e)
-            GX.add_edge(*e)            
+            click.echo(e)
+            GX.add_edge(*e)
     out(GX, G)
+    
+@cli.command(name='sector')
+@click.argument('name', nargs=1, required=True)
+def sector(name):   
+    """Graph sector NAME (regexpr) = neighbours at (1,1)"""       
+    G = get_graph()  
+    
+    # REGEXP on name, sublist of nodes
+    expr = f".*{name}.*$" 
+    subnodes = [item for item in G.nodes if re.match(expr, item,  re.IGNORECASE )   ]
+    # click.echo(subnodes)
+       
+    # up, down  = 1 , 1 
+    # neighbours(up, down, *subnodes) 
+    # return
+
+    GX = nx.DiGraph()
+    # click.echo(nodes)
+    # Recursions
+    def upWard(layer):
+        up_layer = []
+        for n in layer:
+            for m in G.predecessors(n):
+                GX.add_edge(m, n) 
+                up_layer.append(m)
+        return  up_layer
+    
+    def downWard(layer):
+        down_layer = []
+        for n in layer:
+            for p in G.successors(n):
+                GX.add_edge(n,p) 
+                down_layer.append(p)
+        return  down_layer        
+    
+    for node in subnodes:
+        layer = [node]
+        upWard(layer)
+        downWard(layer)
+
+    # Inherit attributes from G
+    for n in GX.nodes():
+        # click.echo(n)
+        GX.nodes[n]['color'] =  G.nodes[n]['color']
+        GX.nodes[n]['name'] =  n 
+
+    out(GX, G)    
 
 cli.add_command(init)
 cli.add_command(parents)
 cli.add_command(children)
 cli.add_command(neighbours)
 cli.add_command(path)
+cli.add_command(sector)
+
 cli.epilog = f"Run '{APP_NAME} COMMAND --help' for more information on a command."
 
 
