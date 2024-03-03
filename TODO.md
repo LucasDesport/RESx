@@ -5,18 +5,16 @@
  - rewrite README
  - write HOWTO, EXAMPLES
  - speak of yEd
- 
- 
+
 ## RES-Explorer
+ - clean code, factorize neighbours and sector
  - resx sector BIO
  - bug if no current-RES.xml implement followings ...
  - resx --graph=PREFIX COMMAND ARGS  
  - rebuild if PREFIX.vdt newer than PREFIX.xml
- - clean code
  - check path
  - poetry
- 
- 
+
 ## DONE
  - merge existing bricks
  - parents list  = neighbours --up=1 --down=0

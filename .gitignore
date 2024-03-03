@@ -19,3 +19,6 @@ res_region_REG1_scen_ALL_sector_ALL.xls
 venv/
 TODO.md
 propertiesmapper.xml
+current-RES.xml
+poetry.lock
+
