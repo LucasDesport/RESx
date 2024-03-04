@@ -23,9 +23,9 @@ MAX_NODES=500
 
 APP_NAME = 'resx'
 
-# UTILITIES
+# VDT and GRAPH processing:   UTILITIES
 def clean_vdt(VDTFILE = 'VDT/newlucas.vdt'):
-    '''Read a VEDA-TIMES vdt_file, clean up a
+    '''Read a VEDA-TIMES vdt_file(skiprows=3), clean up. 
     Return pandas dataframe vdt, and networkx graph G.    
     From corralien: REWScleaner'''
     
@@ -95,12 +95,6 @@ def extract(G, up, down, nodes):
         for count in range(down):
             layer = downWard(layer)
     
-    # Inherit attributes from G
-    for n in GX.nodes():
-        # print(n)
-        GX.nodes[n]['color'] =  G.nodes[n]['color']
-        GX.nodes[n]['name'] =  n 
-        
     return GX
 
 def out(GX, G):
@@ -110,6 +104,12 @@ def out(GX, G):
     # assert nb_nodes <= MAX_NODES, msg
     if nb_nodes > MAX_NODES and input(msg) != 'y':  sys.exit(0)  
     
+    # Inherit attributes from G
+    for n in GX.nodes():
+        # print(n)
+        GX.nodes[n]['color'] =  G.nodes[n]['color']
+        GX.nodes[n]['name'] =  n 
+
     # Add a node title
     GX.add_node("Title")
     GX.nodes["Title"]['name'] =  sub_command   
@@ -129,7 +129,7 @@ def cli():
     '''RES Explorer''' 
     pass
 
-@click.command(name='init', help="""Initialize RES from vdt_file argument to local file current-RES.xml.""")
+@click.command(name='init', help="""Initialize RES from vdt_file argument. Write to local file 'current-RES.xml'.""")
 @click.argument('vdt_file', nargs=1, required=True)
 def init(vdt_file):       
     vdt, G = clean_vdt(vdt_file)
@@ -167,7 +167,7 @@ def path(source, target):
     GX = nx.DiGraph()
     for p in nx.all_shortest_paths(G, source, target):
         for e in zip(p[:-1],p[1:]):
-            print(e)
+            # print(e)
             GX.add_edge(*e)
     out(GX, G)
 
@@ -179,7 +179,6 @@ def neighbours(up, down, nodes):
     G =  get_graph() 
     GX = extract(G, up, down, nodes)
     out(GX, G)
-    
     
 @cli.command(help="""Graph sector NAME (regexpr) as neighbours at (1,1)""" )
 @click.argument('name', nargs=1, required=True)

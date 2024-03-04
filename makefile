@@ -7,10 +7,11 @@ RESX = resx
 default:  check
 
 
+all: clean init parents children  neighbours path sector 
 
 
-children: ;  $(RESX) node_children ELCNUC 
-parents: ;  $(RESX) node_parents ELCNUC 
+children: ;  $(RESX) children ELCNUC 
+parents: ;  $(RESX) parents ELCNUC 
 
 neighbours: ; $(RESX) neighbours --up=1 --down=1  INMFUEL   OILHFO GASRFG
 
