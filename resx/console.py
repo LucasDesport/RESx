@@ -52,6 +52,8 @@ def clean_vdt(VDTFILE = 'VDT/newlucas.vdt'):
         prc, com, flow = row.process, row.commodity, row.direction
         G.add_node(com, commodity=com, bipartite=0, color='blue')
         G.add_node(prc, process=prc, bipartite=1, color='red')
+        G[prc]['type'] = 'process'
+        G[com]['type'] = 'commodity'
         u, v = (com, prc) if row.direction == 'IN' else (prc, com)
         G.add_edge(u, v, direction=flow)  
     
@@ -106,7 +108,8 @@ def out(GX, G):
     
     # Inherit attributes from G
     for n in GX.nodes():
-        # print(n)
+        print(G.nodes[n])
+        GX.nodes[n]['type'] =  'process' if  'process' in G.nodes[n].keys() else   'commodity' 
         GX.nodes[n]['color'] =  G.nodes[n]['color']
         GX.nodes[n]['name'] =  n 
 
@@ -126,7 +129,7 @@ class OrderCommands(click.Group):
 @click.group(cls=OrderCommands)
 @click.version_option(__version__) 
 def cli():
-    '''RES Explorer''' 
+    '''RES Explorer: build RES from VDT file, extract subgraphs.''' 
     pass
 
 @click.command(name='init', help="""Initialize RES from vdt_file argument. Write to local file 'current-RES.xml'.""")
@@ -180,13 +183,13 @@ def neighbours(up, down, nodes):
     GX = extract(G, up, down, nodes)
     out(GX, G)
     
-@cli.command(help="""Graph sector NAME (regexpr) as neighbours at (1,1)""" )
-@click.argument('name', nargs=1, required=True)
-def sector(name):             
+@cli.command(help="""Graph all neighbours at depths=(1,1) of nodes matching *REGEXPR*""" )
+@click.argument('regexpr', nargs=1, required=True)
+def sector(regexpr):             
     G = get_graph()      
-    # REGEXP on name, sublist of nodes
-    expr = f".*{name}.*$" 
-    subnodes = tuple([item for item in G.nodes if re.match(expr, item,  re.IGNORECASE )   ])
+    # REGEXP: sublist of nodes
+    full_expr = f".*{regexpr}.*$" 
+    subnodes = tuple([item for item in G.nodes if re.match(full_expr, item,  re.IGNORECASE )   ])
     up, down  = 1 , 1 
     GX = extract(G, up, down, subnodes)
 
