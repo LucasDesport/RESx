@@ -108,8 +108,8 @@ def out(GX, G):
     
     # Inherit attributes from G
     for n in GX.nodes():
-        print(G.nodes[n])
-        GX.nodes[n]['type'] =  'process' if  'process' in G.nodes[n].keys() else   'commodity' 
+        # print(G.nodes[n])
+        GX.nodes[n]['type'] =  'process' if 'process' in G.nodes[n].keys() else 'commodity' 
         GX.nodes[n]['color'] =  G.nodes[n]['color']
         GX.nodes[n]['name'] =  n 
 
