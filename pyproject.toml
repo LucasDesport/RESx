@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "resx"
-version = "0.0.3"
+version = "0.0.4"
 description = ""
 authors = ["jpm <jean-paul.marmorat@minesparis.psl.eu>"]
 readme = "README.md"

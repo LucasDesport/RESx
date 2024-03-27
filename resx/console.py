@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 import re
 
-__version__ = '0.0.2'
+__version__ = '0.0.4'
 default_xml = 'current-RES.xml'
 sub_command = ' '.join(sys.argv[1:]) 
 MAX_NODES=500
@@ -52,8 +52,6 @@ def clean_vdt(VDTFILE = 'VDT/newlucas.vdt'):
         prc, com, flow = row.process, row.commodity, row.direction
         G.add_node(com, commodity=com, bipartite=0, color='blue')
         G.add_node(prc, process=prc, bipartite=1, color='red')
-        G[prc]['type'] = 'process'
-        G[com]['type'] = 'commodity'
         u, v = (com, prc) if row.direction == 'IN' else (prc, com)
         G.add_edge(u, v, direction=flow)  
     
@@ -109,8 +107,9 @@ def out(GX, G):
     # Inherit attributes from G
     for n in GX.nodes():
         # print(G.nodes[n])
-        GX.nodes[n]['type'] =  'process' if 'process' in G.nodes[n].keys() else 'commodity' 
-        GX.nodes[n]['color'] =  G.nodes[n]['color']
+        color = G.nodes[n]['color']
+        GX.nodes[n]['color'] =  color
+        GX.nodes[n]['type'] =  'process' if  color == 'red' else 'commodity' 
         GX.nodes[n]['name'] =  n 
 
     # Add a node title
