@@ -167,11 +167,16 @@ def children(node):
 def path(source, target):                 
     G = get_graph()  
     GX = nx.DiGraph()
-    for p in nx.all_shortest_paths(G, source, target):
-        for e in zip(p[:-1],p[1:]):
-            # print(e)
-            GX.add_edge(*e)
-    out(GX, G)
+    try:
+        paths = nx.all_shortest_paths(G, source, target)    
+        for p in paths:
+            for e in zip(p[:-1],p[1:]):
+                # print(e)
+                GX.add_edge(*e)
+        out(GX, G) 
+    except:
+         print(f'No path from {source} to {target}')
+         
 
 @cli.command(help="""Graph neighbours at depths UP,DOWN (default 1,1) of a list of NODES""")
 @click.option('--up', nargs=1, default=1)

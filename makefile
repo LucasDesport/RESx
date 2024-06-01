@@ -1,6 +1,6 @@
 VDT = VDT/newlucas.vdt
 RESX = python resx/console.py
-RESX = resx
+%RESX = resx
 
 
 

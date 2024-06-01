@@ -41,6 +41,7 @@ Extract sub-graphs, sufficiently small to be displayed
    <img src="Figures/gshow+path.png" alt="gshow+path" />
     <figcaption  class="figure-caption text-center">resx path ELCNUC INMFUEL</figcaption>
 </figure>
+
 <figure>
    <img src="Figures/gshow+neighbours.png" alt="gshow+neighbours" />   
     <figcaption  class="figure-caption text-center">resx neighbours INMFUEL 3 3</figcaption>
