@@ -135,15 +135,23 @@ def cli():
 @click.argument('vdt_file', nargs=1, required=True)
 def init(vdt_file):       
     vdt, G = clean_vdt(vdt_file)
-    print('Nombre de process    :', vdt['process'].nunique())
-    print('Nombre de commodités :', vdt['commodity'].nunique())
-    print('Nombre de connexions :', len(vdt)) 
+    print('Processes   :', vdt['process'].nunique())
+    print('Commodities :', vdt['commodity'].nunique())
+    print('Connections :', len(vdt)) 
     print(vdt.head(10))
     print('...')
     gv.d3(G, node_label_size_factor=0.5).display()
     nx.write_graphml(G, default_xml)
     print(f"{default_xml} reinitialized with {vdt_file}")
 cli.add_command(init)
+
+@cli.command(name='list', help="""List nodes of givent type""")
+@click.argument('node_type', nargs=1, default='both')
+def list_nodes(node_type):    
+    G = get_graph() 
+    print(sub_command)
+    print(G.nodes)
+
 
 @cli.command(help="""List parents nodes of argument NODE""")
 @click.argument('node', nargs=1, required=True)
