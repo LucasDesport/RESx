@@ -89,9 +89,12 @@ def extract(G, up, down, nodes):
     
     # Recursions
     for node in nodes:
+        
         layer = [node]
         for count in range(up):
             layer = upWard(layer)
+            
+        layer = [node]            
         for count in range(down):
             layer = downWard(layer)
     
@@ -202,7 +205,8 @@ def sector(regexpr):
     # REGEXP: sublist of nodes
     full_expr = f".*{regexpr}.*$" 
     subnodes = tuple([item for item in G.nodes if re.match(full_expr, item,  re.IGNORECASE )   ])
-    up, down  = 1 , 1 
+    print(subnodes)
+    up, down  = 1, 1
     GX = extract(G, up, down, subnodes)
 
     out(GX, G)    
