@@ -3,9 +3,9 @@ name = "resx"
 version = "0.0.4"
 description = "RES Explorer: VDT files postprocessing"
 authors = [
-"lucas.desport@minesparis.psl.eu",
-"damien.corral@minesparis.psl.eu",
-"jean-paul.marmorat@minesparis.psl.eu",
+"Lucas Desport <lucas.desport@minesparis.psl.eu>",
+"Damien Corral <damien.corral@minesparis.psl.eu>",
+"Jean-Paul Marmorat <jean-paul.marmorat@minesparis.psl.eu>",
 ]
 readme = "README.md"
 
