@@ -1,23 +1,23 @@
 [tool.poetry]
 name = "resx"
 version = "0.0.4"
-description = ""
-authors = ["jpm <jean-paul.marmorat@minesparis.psl.eu>"]
+description = "RES Explorer: VDT files postprocessing"
+authors = [
+"lucas.desport@minesparis.psl.eu",
+"damien.corral@minesparis.psl.eu",
+"jean-paul.marmorat@minesparis.psl.eu",
+]
 readme = "README.md"
 
 [tool.poetry.scripts]
 resx  = "resx .console:cli"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 pandas = ">=1.5.3"
 click = "^8.1.3"
-tqdm = "^4.65.0"
-rich = "^13.3.4"
-jinja2 = "^3.1.3"
-
-[tool.poetry.group.dev.dependencies]
-ipython = "^8.12.0"
+networkx = "^3.3"
+gravis = "^0.1.0"
 
 [build-system]
 requires = ["poetry-core"]
