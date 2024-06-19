@@ -148,12 +148,6 @@ def init(vdt_file):
     print(f"{default_xml} reinitialized with {vdt_file}")
 cli.add_command(init)
 
-@cli.command(name='list', help="""List nodes of givent type""")
-@click.argument('node_type', nargs=1, default='both')
-def list_nodes(node_type):    
-    G = get_graph() 
-    print(sub_command)
-    print(G.nodes)
 
 
 @cli.command(help="""List parents nodes of argument NODE""")
