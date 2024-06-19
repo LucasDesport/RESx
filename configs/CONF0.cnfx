@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <styles>
-  <style name="RES-Configuration" scope="node" selectionOnly="false">
+  <style name="RES" scope="node" selectionOnly="false">
     <mapping>
       <source name="type" origin="customProperty" type="string"/>
       <target name="template" type="nodeTemplate">
@@ -169,9 +169,8 @@
       <source name="name" origin="customProperty" type="string"/>
       <target name="labelText" type="string">
         <hints>
-          <hint type="string">replace</hint>
           <hint type="boolean">true</hint>
-          <hint type="int">1</hint>
+          <hint type="int">0</hint>
         </hints>
       </target>
       <conversion type="asIs"/>
